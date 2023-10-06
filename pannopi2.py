@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#@created: 16.02.2023
+#@created: 06.10.2023
 #@author: Danil Zilov
 #@contact: zilov.d@gmail.com
 
@@ -47,9 +47,12 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Process assembly fasta and coverage bed files.')
     parser.add_argument("-m", "--mode", help="mode to use", 
-                        choices=["hifi", "paired_reads", "nanopore", "pacbio", "coverage"], default="hifi")
-    parser.add_argument('-a', '--assembly', type=str, help='Path to the assembly fasta file.', required=True)
-    parser.add_argument("-hifi", type=str, help='Path to the hifi reads fastq file.', default="")
+                        choices=["short", "long", "hybrid"], default="short")
+    parser.add_argument('-1', '--forward', type=str, help='Path to the forward fastq file.', required=True)
+    parser.add_argument('-2', '--reverse', type=str, help='Path to the reverse fastq file.', required=True) 
+    parser.add_argument('--skip-trimming', help='Skip trimming step', action='store_true') 
+    parser.add_argument('-a', '--assembly', type=str, help='Path to the assembly fasta file.')
+    parser.add_argument("-long", type=str, help='Path to the long reads fastq file.', default="")
     parser.add_argument('-t','--threads', type=int, help='number of threads [default == 8]', default = 8)
     parser.add_argument('-p', '--prefix', help="output files prefix (assembly file prefix by default)", default='')
     parser.add_argument('-o', '--output_folder', type=str, default="./asShredder", help='Path to the output folder.')
@@ -59,8 +62,11 @@ if __name__ == '__main__':
     
     ## parse args
     mode = args.mode
-    assembly = check_input(args.assembly)
-    hifi = check_input(args.hifi)
+    assembly = args.assembly
+    long_reads = None
+    fr = check_input(args.forward)
+    rr = check_input(args.reverse)
+    skip_trimming = args.skip_trimming   
     output_folder = os.path.abspath(args.output_folder)
     debug = args.debug
     threads = args.threads
@@ -82,7 +88,10 @@ if __name__ == '__main__':
         "run_folder": run_folder,
         "mode" : mode,
         "assembly": assembly,
-        "hifi": hifi,
+        "fr" : fr,
+        "rr" : rr,
+        "skip_trimming": skip_trimming,
+        "long": long_reads,
         "outdir" : output_folder,
         "execution_folder" : execution_folder,
         "prefix" : prefix,
