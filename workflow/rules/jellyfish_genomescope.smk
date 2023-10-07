@@ -15,9 +15,8 @@ rule jellycount:
             -m 23 \
             -t {threads} \
             -s 2G \
-            -C \
             -o {output} \
-            <(zcat {input.fr}) <(zcat {input.rr})
+            <(zcat {input}) 
         """
 
 rule jellyhisto:

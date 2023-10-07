@@ -6,6 +6,7 @@ SKIP_TRIMMING = config["skip_trimming"]
 LONG = config["long"]
 ASSEMBLY = config["assembly"]
 EXECUTION_FOLDER = config['execution_folder']
+# BUSCO_LINEAGE = config['busco_lineage']
 MODE = config["mode"]
 PREFIX = config["prefix"]
 
@@ -13,7 +14,9 @@ PREFIX = config["prefix"]
 rule all:
     input:
         f"{OUTDIR}/qc/jellyfish_genomescope/{PREFIX}_linear_plot.png",
-        f"{OUTDIR}/qc/fastqc_raw/{PREFIX}_R1_fastqc.zip"
+        f"{OUTDIR}/qc/fastqc_raw/{PREFIX}_R1_fastqc.zip",
+        f"{OUTDIR}/quast/report.txt",
+        f"{OUTDIR}/prokka/{PREFIX}.faa"
         # assembly = "",
         # quast_report = "",
         # busco_report = "",
@@ -27,8 +30,9 @@ rule envs:
         jellyfish = "../envs/jellyfish.yaml",
         genomescope = "../envs/genomescope.yaml",
         fastqc = "../envs/fastqc.yaml",
-        spades = "./envs/spades.yaml",
-        prokka = "./envs/prokks.yaml",
+        spades = "../envs/spades.yaml",
+        quast = "../envs/quast.yaml",
+        prokka = "../envs/prokka.yaml",
 
 envs = rules.envs.input ## you could use envs.align in rules
 
@@ -44,17 +48,15 @@ if not SKIP_TRIMMING:
 
 include: "./rules/jellyfish_genomescope.smk"
 
+include: "./rules/spades.smk"
 
+ASSEMBLY = rules.assembly.output.assembly
 
-# include: "./rules/spades.smk"
-
-# ASSEMBLY = rules.assembly.output.assembly
-
-# include: "./rules/quast.smk"
+include: "./rules/quast.smk"
 
 # include: "./rules/busco"
 
-# include: "./rules/prokka.smk"
+include: "./rules/prokka.smk"
 
 # include: './rules/kraken2.smk'
 
